@@ -18,6 +18,7 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def create_token(user_id: int) -> str:
+    
     expire = datetime.utcnow() + timedelta(minutes=JWT_TOKEN_EXPIRATION_TIME_MINUTES)
     
     payload = {"user_id": user_id, "exp": expire}
