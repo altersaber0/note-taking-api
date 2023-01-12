@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, Response, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -25,7 +25,7 @@ def sign_up(new_user: user_schema.UserCreate, db: Session = Depends(get_db)):
         db.add(user)
         db.commit()
         
-    # except when UNIQUE constraint on users.email fails
+    # when UNIQUE constraint on users.email fails (email already exists)
     except IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -68,3 +68,33 @@ def update_user(
     db.refresh(user)
 
     return user
+
+
+@router.delete("/{id}", response_model=user_schema.UserInfo)
+def delete_user(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user_id = Depends(get_current_user_id)
+):
+
+    query = db.query(User).filter(User.id == id)
+
+    user = query.first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Requested user id does not exist"
+        )
+    
+    if id != current_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to delete other users"
+        )
+    
+    query.delete(synchronize_session=False)
+
+    db.commit()
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
