@@ -2,10 +2,10 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from ..schemas import user as user_schema
 from ..database.db_setup import get_db
 from ..database.models import User
 from ..database import password
+from ..schemas import user as user_schema
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -28,4 +28,5 @@ def sign_up(new_user: user_schema.UserCreate, db: Session = Depends(get_db)):
         )
     
     db.refresh(user)
+    
     return user
