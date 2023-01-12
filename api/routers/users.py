@@ -37,6 +37,32 @@ def sign_up(new_user: user_schema.UserCreate, db: Session = Depends(get_db)):
     return user
 
 
+@router.get("/{id}", response_model=user_schema.UserInfo)
+def get_user_by_id(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user_id = Depends(get_current_user_id)
+):
+
+    if id != current_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to see other users' information"
+        )
+
+    user = db.query(User).filter(User.id == id).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Requested user id does not exist"
+        )
+
+    return user
+    
+
+
+
 @router.put("/{id}", response_model=user_schema.UserInfo)
 def update_user(
     id: int,
