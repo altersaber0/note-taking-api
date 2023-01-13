@@ -32,6 +32,38 @@ def create_group(
     return new_group
 
 
+@router.get("/", response_model=list[group_schema.GroupWithNotes])
+def get_all_groups_with_notes(
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id)
+):
+    
+    results = db\
+        .query(Group, Note)\
+        .filter(Group.user_id == current_user_id)\
+        .join(Note, Group.id == Note.group_id, isouter=True)\
+        .group_by(Note.id)\
+        .all()
+
+    groups = list({result[0] for result in results})
+
+    groups_with_notes = []
+    
+    for group in groups:
+        group_with_notes = {"group": group, "notes": []}
+
+        for note in (result[1] for result in results):
+            if note:
+                if note.group_id == group.id:
+                    group_with_notes["notes"].append(note)
+            else:
+                continue
+
+        groups_with_notes.append(group_with_notes)
+
+    return groups_with_notes
+
+
 @router.get("/{id}", response_model=group_schema.GroupWithNotes)
 def get_group_with_notes_by_id(
     id: int,
