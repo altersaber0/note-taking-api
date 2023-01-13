@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=note_schema.NoteInfo)
+@router.post("/", response_model=note_schema.NoteInfo, status_code=status.HTTP_201_CREATED)
 def create_note(
     note: note_schema.NoteCreate,
     db: Session = Depends(get_db),
@@ -44,3 +44,38 @@ def create_note(
     db.refresh(new_note)
 
     return new_note
+
+
+@router.get("/", response_model=list[note_schema.NoteInfo])
+def get_all_notes(
+    db: Session = Depends(get_db),
+    current_user_id = Depends(get_current_user_id)
+):
+
+    notes = db.query(Note).filter(Note.user_id == current_user_id).all()
+    
+    return notes
+
+
+@router.get("/{id}", response_model=note_schema.NoteInfo)
+def get_note_by_id(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user_id = Depends(get_current_user_id)
+):
+    
+    note = db.query(Note).filter(Note.id == id).first()
+
+    if not note:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Requested note id does not exist"
+        )
+    
+    if note.user_id != current_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to see other users' notes"
+        )
+    
+    return note

@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=group_schema.GroupInfo)
+@router.post("/", response_model=group_schema.GroupInfo, status_code=status.HTTP_201_CREATED)
 def create_group(
     group: group_schema.GroupCreate,
     db: Session = Depends(get_db),
