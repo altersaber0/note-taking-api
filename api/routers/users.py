@@ -8,7 +8,6 @@ from ..database import password
 from ..schemas import user as user_schema
 from ..oauth2 import get_current_user_id
 
-
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
@@ -59,8 +58,6 @@ def get_user_by_id(
         )
 
     return user
-    
-
 
 
 @router.put("/{id}", response_model=user_schema.UserInfo)

@@ -6,14 +6,17 @@ from ..database.models import Group, Note
 from ..schemas import group as group_schema
 from ..oauth2 import get_current_user_id
 
-
 router = APIRouter(
     prefix="/groups",
     tags=["Groups"]
 )
 
 
-@router.post("/", response_model=group_schema.GroupInfo, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=group_schema.GroupInfo,
+    status_code=status.HTTP_201_CREATED
+)
 def create_group(
     group: group_schema.GroupCreate,
     db: Session = Depends(get_db),

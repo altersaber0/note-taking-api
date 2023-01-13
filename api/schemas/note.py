@@ -30,3 +30,4 @@ class NoteInfoWithoutRelations(BaseModel):
 
     class Config:
         orm_mode = True
+      

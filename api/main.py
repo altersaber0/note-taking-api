@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from .database.db_setup import engine, Base
 from .routers import notes, groups, users, auth
 
-
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()

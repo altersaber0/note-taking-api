@@ -8,7 +8,6 @@ from ..database import password
 from ..schemas import token as token_schema
 from ..oauth2 import create_token
 
-
 router = APIRouter()
 
 
@@ -18,7 +17,7 @@ def login(
     db: Session = Depends(get_db)
 ):
 
-    user: User = db.query(User).filter(User.email == credentials.username).first()
+    user = db.query(User).filter(User.email == credentials.username).first()
 
     if not user:
         raise HTTPException(

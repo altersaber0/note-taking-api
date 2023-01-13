@@ -6,14 +6,17 @@ from ..database.models import Group, Note
 from ..schemas import note as note_schema
 from ..oauth2 import get_current_user_id
 
-
 router = APIRouter(
     prefix="/notes",
     tags=["Notes"]
 )
 
 
-@router.post("/", response_model=note_schema.NoteInfo, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=note_schema.NoteInfo,
+    status_code=status.HTTP_201_CREATED
+)
 def create_note(
     note: note_schema.NoteCreate,
     db: Session = Depends(get_db),
