@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, Response, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 
 from ..database.db_setup import get_db
@@ -82,7 +82,7 @@ def get_note_by_id(
 
 
 @router.put("/{id}", response_model=note_schema.NoteInfo)
-def update_note(
+def update_note_by_id(
     id: int,
     updated_note: note_schema.NoteUpdate,
     db: Session = Depends(get_db),
@@ -110,3 +110,33 @@ def update_note(
     db.refresh(note)
     
     return note
+
+
+@router.delete("/{id}")
+def delete_note_by_id(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user_id = Depends(get_current_user_id)
+):
+    
+    query = db.query(Note).filter(Note.id == id)
+
+    note = query.first()
+
+    if not note:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Requested note id does not exist"
+        )
+    
+    if note.user_id != current_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to delete other users' notes"
+        )
+    
+    query.delete(synchronize_session=False)
+
+    db.commit()
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

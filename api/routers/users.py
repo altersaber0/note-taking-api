@@ -96,7 +96,7 @@ def update_user(
     return user
 
 
-@router.delete("/{id}", response_model=user_schema.UserInfo)
+@router.delete("/{id}")
 def delete_user(
     id: int,
     db: Session = Depends(get_db),
