@@ -34,4 +34,4 @@ def login(
     
     token = create_token(user.id)
 
-    return token_schema.TokenResponse(token=token, type="Bearer")
+    return token_schema.TokenResponse(access_token=token, token_type="bearer")

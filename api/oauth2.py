@@ -48,7 +48,7 @@ def get_current_user_id(token: str = Depends(oauth2_schema)) -> int:
     
     creadentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=f"Couldn't validate credentials",
+        detail=f"Invalid authentication credentials",
         headers={"WWW-Authenticate": "Bearer"}
     )
 
