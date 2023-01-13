@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from .note import NoteInfo
+from .note import NoteInfoWithoutRelations
 
 
 class GroupCreate(BaseModel):
@@ -20,4 +20,7 @@ class GroupInfo(GroupCreate):
 
 class GroupWithNotes(BaseModel):
     group: GroupInfo
-    notes: list[NoteInfo]
+    notes: list[NoteInfoWithoutRelations]
+
+    class Config:
+        orm_mode = True

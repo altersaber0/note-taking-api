@@ -21,3 +21,12 @@ class NoteInfo(NoteCreate):
 
     class Config:
         orm_mode = True
+
+class NoteInfoWithoutRelations(BaseModel):
+    id: int
+    title: str
+    content: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True

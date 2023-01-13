@@ -32,6 +32,32 @@ def create_group(
     return new_group
 
 
+@router.get("/{id}", response_model=group_schema.GroupWithNotes)
+def get_group_with_notes_by_id(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id)
+):
+    
+    group = db.query(Group).filter(Group.id == id).first()
+
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Requested group id does not exist"
+        )
+    
+    if group.user_id != current_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to see other users' groups"
+        )
+    
+    results = db.query(Group, Note).join(Note, Group.id == Note.group_id).group_by(Note.id).filter(Group.id == id).all()
+
+    return group_schema.GroupWithNotes(group=group, notes=[result[1] for result in results])
+
+
 @router.put("/{id}", response_model=group_schema.GroupInfo)
 def update_group_by_id(
     id: int,
