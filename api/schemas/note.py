@@ -9,6 +9,11 @@ class NoteCreate(BaseModel):
     group_id: int
 
 
+class NoteUpdate(BaseModel):
+    title: str = Field(min_length=1, max_length=128)
+    content: str
+
+
 class NoteInfo(NoteCreate):
     id: int
     user_id: int

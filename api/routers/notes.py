@@ -79,3 +79,34 @@ def get_note_by_id(
         )
     
     return note
+
+
+@router.put("/{id}", response_model=note_schema.NoteInfo)
+def update_note(
+    id: int,
+    updated_note: note_schema.NoteUpdate,
+    db: Session = Depends(get_db),
+    current_user_id = Depends(get_current_user_id)
+):
+
+    query = db.query(Note).filter(Note.id == id)
+
+    note = query.first()
+
+    if not note:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Requested note id does not exist"
+        )
+    
+    if note.user_id != current_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to update other users' notes"
+        )
+
+    query.update(updated_note.dict())
+    db.commit()
+    db.refresh(note)
+    
+    return note
