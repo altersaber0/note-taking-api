@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, Response, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 
 from ..database.db_setup import get_db
@@ -61,3 +61,33 @@ def update_group_by_id(
     db.refresh(group)
     
     return group
+
+
+@router.delete("/{id}")
+def delete_group_by_id(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user_id = Depends(get_current_user_id)
+):
+    
+    query = db.query(Group).filter(Group.id == id)
+
+    group = query.first()
+
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Requested group id does not exist"
+        )
+    
+    if group.user_id != current_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to delete other users' groups"
+        )
+    
+    query.delete(synchronize_session=False)
+
+    db.commit()
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
