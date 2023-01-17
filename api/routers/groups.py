@@ -6,10 +6,7 @@ from ..database.models import Group, Note
 from ..schemas import group as group_schema
 from ..oauth2 import get_current_user_id
 
-router = APIRouter(
-    prefix="/groups",
-    tags=["Groups"]
-)
+router = APIRouter(prefix="/groups", tags=["Groups"])
 
 
 @router.post(
@@ -48,8 +45,10 @@ def get_all_groups_with_notes(
         .group_by(Note.id)\
         .all()
 
+    # Filter rows to get all unique groups
     groups = list({result[0] for result in results})
 
+    # Add all notes to corresponding groups' ["notes"] key
     groups_with_notes = []
     
     for group in groups:
@@ -88,9 +87,17 @@ def get_group_with_notes_by_id(
             detail="Not allowed to see other users' groups"
         )
     
-    results = db.query(Group, Note).join(Note, Group.id == Note.group_id).group_by(Note.id).filter(Group.id == id).all()
+    results = db\
+        .query(Group, Note)\
+        .join(Note, Group.id == Note.group_id)\
+        .group_by(Note.id)\
+        .filter(Group.id == id)\
+        .all()
 
-    return group_schema.GroupWithNotes(group=group, notes=[result[1] for result in results])
+    return group_schema.GroupWithNotes(
+        group=group,
+        notes=[result[1] for result in results]
+    )
 
 
 @router.put("/{id}", response_model=group_schema.GroupInfo)

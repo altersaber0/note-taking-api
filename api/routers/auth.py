@@ -8,7 +8,7 @@ from ..database import password
 from ..schemas import token as token_schema
 from ..oauth2 import create_token
 
-router = APIRouter()
+router = APIRouter(tags=["Authentication"])
 
 
 @router.post("/login", response_model=token_schema.TokenResponse)

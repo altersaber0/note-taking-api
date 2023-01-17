@@ -19,6 +19,7 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl="login")
 
 def create_token(user_id: int) -> str:
     
+    # Add expiration field to the token
     expire = datetime.utcnow() + timedelta(minutes=JWT_TOKEN_EXPIRATION_TIME_MINUTES)
     
     payload = {"user_id": user_id, "exp": expire}
@@ -28,6 +29,7 @@ def create_token(user_id: int) -> str:
     return token
 
 
+# Decrypt and get "user_id" field from token's payload
 def decrypt_token(token: str, credentials_exception: HTTPException) -> int:
     
     try:
@@ -44,6 +46,7 @@ def decrypt_token(token: str, credentials_exception: HTTPException) -> int:
     return user_id
 
 
+# Dependency to be injected in endpoint functions
 def get_current_user_id(token: str = Depends(oauth2_schema)) -> int:
     
     creadentials_exception = HTTPException(

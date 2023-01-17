@@ -22,6 +22,8 @@ class NoteInfo(NoteCreate):
     class Config:
         orm_mode = True
 
+
+# Exclude user and group ids because Group already contains this information
 class NoteInfoWithoutRelations(BaseModel):
     id: int
     title: str
