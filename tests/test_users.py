@@ -4,10 +4,9 @@ from fastapi.testclient import TestClient
 from .setup import (
     db,
     client,
-    user_1,
-    authenticated_client_1,
-    user_2,
-    authenticated_client_2
+    user,
+    token,
+    authenticated_client,
 )
 
 
@@ -20,7 +19,7 @@ from .setup import (
     ("example@example.com", "", 422),
     ("example@example.com", "password123", 201)
 ])
-def test_signup(client: TestClient, email: str, password: str, status_code: int):
+def test_signup(client, email, password, status_code):
     signup_data = {
         "email": email,
         "password": password
@@ -28,4 +27,17 @@ def test_signup(client: TestClient, email: str, password: str, status_code: int)
 
     response = client.post("/users/", json=signup_data)
     
+    assert response.status_code == status_code
+
+
+@pytest.mark.parametrize("id, status_code", [
+    (1, 200),
+    (2, 403),
+    (100000, 403),
+    ("qwe", 422),
+    ("", 405)
+])
+def test_get_user_by_id(authenticated_client, id, status_code):
+    response = authenticated_client.get(f"/users/{id}")
+
     assert response.status_code == status_code

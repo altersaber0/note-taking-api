@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker, Session
 
 from api.main import app
 from api.database.db_setup import get_db, Base
+from api.oauth2 import create_token
 
 SQLITE_DATABASE_URL = "sqlite:///./tests/test.db"
 
@@ -42,7 +43,7 @@ def client(db: Session) -> TestClient:
 
 
 @pytest.fixture
-def user_1(client: TestClient) -> dict:
+def user(client: TestClient) -> dict:
     signup_data = {
         "email": "example1@example.com",
         "password": "password1"
@@ -62,56 +63,13 @@ def user_1(client: TestClient) -> dict:
 
 
 @pytest.fixture
-def authenticated_client_1(client: TestClient, user_1: dict) -> TestClient:
-    login_data = {
-        "username": user_1["email"],
-        "password": user_1["password"]
-    }
-
-    response = client.post("/login", data=login_data)
-
-    assert response.status_code == 200
-
-    token = response.json().get("access_token")
-
-    client.headers = {**client.headers, "Authorization": f"Bearer {token}"}
-
-    return client
+def token(user: dict) -> str:
+    return create_token(user["id"])
 
 
 @pytest.fixture
-def user_2(client: TestClient) -> dict:
-    signup_data = {
-        "email": "example2@example.com",
-        "password": "password2"
-    }
+def authenticated_client(token: str, client: TestClient) -> TestClient:
 
-    response = client.post("/users/", json=signup_data)
-    
-    assert response.status_code == 201
-
-    user = response.json()
-
-    assert user["id"] == 2
-
-    user["password"] = signup_data["password"]
-
-    return user
-
-
-@pytest.fixture
-def authenticated_client_2(client: TestClient, user_2: dict) -> TestClient:
-    login_data = {
-        "username": user_2["email"],
-        "password": user_2["password"]
-    }
-
-    response = client.post("/login", data=login_data)
-
-    assert response.status_code == 200
-
-    token = response.json().get("access_token")
-
-    client.headers = {**client.headers, "Authorization": f"Bearer {token}"}
+    client.headers.update({"Authorization": f"Bearer {token}"})
 
     return client
