@@ -3,10 +3,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
-from ..api.main import app
-from ..api.database.db_setup import get_db, Base
+from api.main import app
+from api.database.db_setup import get_db, Base
 
-SQLITE_DATABASE_URL = "sqlite:///:memory:"
+SQLITE_DATABASE_URL = "sqlite:///./tests/test.db"
 
 engine = create_engine(
     SQLITE_DATABASE_URL, connect_args={"check_same_thread": False}
@@ -17,7 +17,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 @pytest.fixture
 def db() -> Session:
-
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
     db = TestingSessionLocal()
@@ -25,8 +25,6 @@ def db() -> Session:
         yield db
     finally:
         db.close()
-        
-        Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture
@@ -40,7 +38,7 @@ def client(db: Session) -> TestClient:
     
     app.dependency_overrides[get_db] = override_get_db
 
-    return TestClient(app)
+    yield TestClient(app)
 
 
 @pytest.fixture
