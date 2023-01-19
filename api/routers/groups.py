@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Response, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 
@@ -32,7 +34,7 @@ def create_group(
     return new_group
 
 
-@router.get("/", response_model=list[group_schema.GroupWithNotes])
+@router.get("/", response_model=List[group_schema.GroupWithNotes])
 def get_all_groups_with_notes(
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user_id)

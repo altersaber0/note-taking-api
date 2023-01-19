@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Response, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 
@@ -46,7 +48,7 @@ def create_note(
     return new_note
 
 
-@router.get("/", response_model=list[note_schema.NoteInfo])
+@router.get("/", response_model=List[note_schema.NoteInfo])
 def get_all_notes(
     db: Session = Depends(get_db),
     current_user_id = Depends(get_current_user_id)
