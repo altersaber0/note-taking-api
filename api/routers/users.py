@@ -84,6 +84,8 @@ def update_user(
             detail="Not allowed to update other users' information"
         )
     
+    updated_data.password = password.hash(updated_data.password)
+
     query.update(updated_data.dict())
 
     db.commit()
