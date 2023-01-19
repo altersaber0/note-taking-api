@@ -27,3 +27,8 @@ app.include_router(notes.router)
 app.include_router(groups.router)
 app.include_router(users.router)
 app.include_router(auth.router)
+
+
+@app.get("/")
+def root():
+    return {"Hello": "World"}
