@@ -1,0 +1,6 @@
+tests/
+venv/
+.gitignore
+notes_api.db
+.pytest_cache
+__pycache__
