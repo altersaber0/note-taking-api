@@ -7,10 +7,10 @@ from api.main import app
 from api.database.db_setup import get_db, Base
 from api.oauth2 import create_token
 
-SQLITE_DATABASE_URL = "sqlite:///./tests/test.db"
+DATABASE_URL = "sqlite:///./tests/test.db"
 
 engine = create_engine(
-    SQLITE_DATABASE_URL, connect_args={"check_same_thread": False}
+    DATABASE_URL, connect_args={"check_same_thread": False}
 )
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

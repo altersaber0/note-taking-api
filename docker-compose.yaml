@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env
+  
+  db:
+    image: postgres:latest
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+
+  # nginx:
+  #   image: nginx:latest
+  #   depends_on:
+  #     - api
+  #   ports:
+  #     - 80:80
+  #   volumes:
+  #     - ./nginx-config:/etc/nginx/conf.d
+
+volumes:
+  postgres-data:
