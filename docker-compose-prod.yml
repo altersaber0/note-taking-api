@@ -22,13 +22,11 @@ services:
       - net
   
   nginx:
-    image: nginx:latest
+    build: nginx/
     depends_on:
       - api
     ports:
       - 80:80
-    volumes:
-      - ./nginx:/etc/nginx/sites-available
     networks:
       - net
 
