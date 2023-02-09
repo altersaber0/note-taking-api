@@ -9,6 +9,8 @@ services:
       - 8000
     env_file:
       - ./.env
+    networks:
+      - net
   
   db:
     image: postgres:latest
@@ -16,13 +18,22 @@ services:
       - postgres-data:/var/lib/postgresql/data
     env_file:
       - ./.env
+    networks:
+      - net
   
   nginx:
-    build: nginx/
+    image: nginx:latest
     depends_on:
       - api
     ports:
       - 80:80
+    volumes:
+      - ./nginx:/etc/nginx/sites-available
+    networks:
+      - net
 
 volumes:
   postgres-data:
+
+networks:
+  net:
